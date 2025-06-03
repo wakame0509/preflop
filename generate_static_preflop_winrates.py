@@ -102,3 +102,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    # Renderが「ポート未検出で強制終了」するのを防ぐ
+    import time
+    time.sleep(600)  # 10分間ポートなしでスリープ（ログ閲覧＆出力保証）
