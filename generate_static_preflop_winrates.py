@@ -1,9 +1,7 @@
 import eval7
 import random
 import json
-import time
 from hand_range_matrix import PREDEFINED_HAND_RANGES
-
 
 def estimate_winrate(hero_hand, villain_range, iters=100000):
     hero = [eval7.Card(card) for card in hero_hand]
@@ -24,7 +22,6 @@ def estimate_winrate(hero_hand, villain_range, iters=100000):
             deck.cards.remove(card)
 
         board = deck.sample(5)
-
         hero_combined = hero + board
         villain_combined = villain + board
 
@@ -38,7 +35,6 @@ def estimate_winrate(hero_hand, villain_range, iters=100000):
 
     return hero_score / iters
 
-
 def get_all_starting_hands():
     ranks = "AKQJT98765432"
     hands = []
@@ -51,7 +47,6 @@ def get_all_starting_hands():
             else:
                 hands.append(r1 + r2)
     return hands
-
 
 def estimate_winrate_for_hand_vs_range(hand_str, villain_range, iters=100000):
     rank1, rank2 = hand_str[0], hand_str[1]
@@ -83,7 +78,6 @@ def estimate_winrate_for_hand_vs_range(hand_str, villain_range, iters=100000):
 
     return sum(results) / len(results) if results else 0
 
-
 def main():
     for percent in ["25%", "30%"]:
         print(f"--- Generating winrates vs {percent} range ---")
@@ -98,10 +92,4 @@ def main():
             print(f"  → {hand}: {results[hand]}%")
 
         print(f"--- Completed {percent} range ---")
-        print(json.dumps(results, indent=2))  # ログにJSON表示
-
-
-if __name__ == "__main__":
-    main()
-    print("✅ All calculations finished. Sleeping to keep Render alive...")
-    time.sleep(600)
+        print(json.dumps(results, indent=2))  # JSON出力
