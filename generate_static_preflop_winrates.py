@@ -1,6 +1,7 @@
 import eval7
 import random
 import json
+import time
 from hand_range_matrix import PREDEFINED_HAND_RANGES
 
 
@@ -13,7 +14,6 @@ def estimate_winrate(hero_hand, villain_range, iters=100000):
         for card in hero:
             deck.cards.remove(card)
 
-        # 相手ハンドを1つランダムに選ぶ
         while True:
             villain = random.sample(deck.cards, 2)
             v1, v2 = str(villain[0]), str(villain[1])
@@ -68,7 +68,7 @@ def estimate_winrate_for_hand_vs_range(hand_str, villain_range, iters=100000):
             for s2 in suits:
                 if s1 != s2:
                     combos.append([rank1 + s1, rank2 + s2])
-    else:  # pair
+    else:
         for i in range(len(suits)):
             for j in range(i + 1, len(suits)):
                 combos.append([rank1 + suits[i], rank2 + suits[j]])
@@ -86,23 +86,22 @@ def estimate_winrate_for_hand_vs_range(hand_str, villain_range, iters=100000):
 
 def main():
     for percent in ["25%", "30%"]:
-        print(f"Generating winrates vs {percent} range...")
+        print(f"--- Generating winrates vs {percent} range ---")
         results = {}
         villain_range = PREDEFINED_HAND_RANGES[percent]
         all_hands = get_all_starting_hands()
 
-        for hand in all_hands:
+        for i, hand in enumerate(all_hands, 1):
+            print(f"[{i}/{len(all_hands)}] Calculating {hand}...")
             wr = estimate_winrate_for_hand_vs_range(hand, villain_range, iters=100000)
             results[hand] = round(wr * 100, 1)
-            print(f"{hand}: {results[hand]}%")
+            print(f"  → {hand}: {results[hand]}%")
 
-        with open(f"static_winrates_{percent.replace('%','')}.json", "w") as f:
-            json.dump(results, f, indent=2)
+        print(f"--- Completed {percent} range ---")
+        print(json.dumps(results, indent=2))  # ログにJSON表示
 
 
 if __name__ == "__main__":
     main()
-
-    # Renderが「ポート未検出で強制終了」するのを防ぐ
-    import time
-    time.sleep(600)  # 10分間ポートなしでスリープ（ログ閲覧＆出力保証）
+    print("✅ All calculations finished. Sleeping to keep Render alive...")
+    time.sleep(600)
