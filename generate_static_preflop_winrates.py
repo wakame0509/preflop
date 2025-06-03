@@ -1,6 +1,5 @@
 import eval7
 import random
-import json
 from hand_range_matrix import PREDEFINED_HAND_RANGES
 
 def estimate_winrate(hero_hand, villain_range, iters=100000):
@@ -78,18 +77,14 @@ def estimate_winrate_for_hand_vs_range(hand_str, villain_range, iters=100000):
 
     return sum(results) / len(results) if results else 0
 
-def main():
-    for percent in ["25%", "30%"]:
-        print(f"--- Generating winrates vs {percent} range ---")
-        results = {}
-        villain_range = PREDEFINED_HAND_RANGES[percent]
-        all_hands = get_all_starting_hands()
+def generate_winrates(percent="25%", iters=100000):
+    results = {}
+    villain_range = PREDEFINED_HAND_RANGES[percent]
+    all_hands = get_all_starting_hands()
 
-        for i, hand in enumerate(all_hands, 1):
-            print(f"[{i}/{len(all_hands)}] Calculating {hand}...")
-            wr = estimate_winrate_for_hand_vs_range(hand, villain_range, iters=100000)
-            results[hand] = round(wr * 100, 1)
-            print(f"  → {hand}: {results[hand]}%")
+    for i, hand in enumerate(all_hands, 1):
+        print(f"[{i}/{len(all_hands)}] {hand}")
+        wr = estimate_winrate_for_hand_vs_range(hand, villain_range, iters)
+        results[hand] = round(wr * 100, 1)
 
-        print(f"--- Completed {percent} range ---")
-        print(json.dumps(results, indent=2))  # JSON出力
+    return results
