@@ -1,20 +1,13 @@
-import threading
-import time
-from flask import Flask
-from generate_static_preflop_winrates import main
+import streamlit as st
+from generate_static_preflop_winrates import generate_winrates
 
-app = Flask(__name__)
+st.title("プリフロップ勝率生成ツール（vs 指定レンジ）")
 
-@app.route('/')
-def index():
-    return "Monte Carlo worker is running..."
+selected_range = st.selectbox("対象レンジを選択してください", ["25%", "30%"])
+iterations = st.slider("試行回数（1ハンドあたり）", 10000, 100000, 50000, step=10000)
 
-def run_worker():
-    print("▶️ Monte Carlo勝率計算開始")
-    main()
-    print("✅ 完了。結果はログに表示されました")
-    time.sleep(600)  # Renderが切られないよう10分キープ
-
-if __name__ == "__main__":
-    threading.Thread(target=run_worker).start()
-    app.run(host='0.0.0.0', port=10000)
+if st.button("勝率を生成する"):
+    st.write("⏳ 勝率計算中...（数分かかることがあります）")
+    results = generate_winrates(percent=selected_range, iters=iterations)
+    st.success("✅ 勝率生成が完了しました！以下の結果をコピーして utils.py に貼り付けてください。")
+    st.json(results)
