@@ -1,2 +1,2 @@
 eval7==0.1.10
-flask
+streamlit
