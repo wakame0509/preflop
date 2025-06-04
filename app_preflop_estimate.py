@@ -4,11 +4,6 @@ from generate_static_preflop_winrates import estimate_winrate_for_hand_vs_range
 
 st.title("🂡 プリフロップ勝率シミュレーター")
 
-st.markdown("""
-任意のスターティングハンドに対して、  
-**相手が上位25%のレンジでプレイする前提**での勝率を、モンテカルロ法で推定します。
-""")
-
 # ハンド選択
 ranks = "AKQJT98765432"
 all_hands = []
@@ -23,15 +18,16 @@ for i, r1 in enumerate(ranks):
 
 selected_hand = st.selectbox("🎴 ハンドを選んでください", all_hands)
 
-# レンジは25%固定
-st.markdown("🎯 相手のハンドレンジは **上位25%** に固定されています。")
-villain_range = PREDEFINED_HAND_RANGES["25%"]
+# レンジ選択
+range_option = st.radio("🎯 相手のレンジ", ["25%"])
+villain_range = PREDEFINED_HAND_RANGES[range_option]
 
-# 試行回数
-iters = st.selectbox("🎲 シミュレーション回数", [10000, 50000, 100000, 200000], index=2)
+# 精度モード選択
+mode = st.radio("⚙️ 精度モードを選択", ["高速（10K）", "中精度（50K）", "高精度（100K）"])
+iters = {"高速（10K）": 10000, "中精度（50K）": 50000, "高精度（100K）": 100000}[mode]
 
 # 計算実行
 if st.button("✅ 勝率を計算"):
-    with st.spinner("計算中..."):
-        winrate = estimate_winrate_for_hand_vs_range(selected_hand, villain_range, iters)
-        st.success(f"{selected_hand} の勝率（vs 上位25%）：{winrate:.2f} %")
+    st.write("計算中...しばらくお待ちください。")
+    winrate = estimate_winrate_for_hand_vs_range(selected_hand, villain_range, iters)
+    st.success(f"{selected_hand} の勝率（vs {range_option}）：{winrate:.2f}%（{mode}）")
